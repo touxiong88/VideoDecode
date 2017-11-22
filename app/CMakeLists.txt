@@ -61,7 +61,8 @@ set_target_properties(  swscale
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
-add_library(myffmpeg
+add_library(
+            myffmpeg
             SHARED
             src/main/cpp/LiveDecode.cpp
             )
@@ -75,7 +76,8 @@ include_directories(libs/include/libswresample)
 include_directories(libs/include/libswscale)
 include_directories(src/main/cpp)
 
-target_link_libraries( myffmpeg
+target_link_libraries(
+                       myffmpeg
                        avcodec
                        avdevice
                        avfilter

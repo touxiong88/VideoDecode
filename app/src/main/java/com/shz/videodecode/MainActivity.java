@@ -1,38 +1,31 @@
 package com.shz.videodecode;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+import com.shz.videodecode.view.VideoView;
+
+import java.io.File;
 
 public class MainActivity
         extends AppCompatActivity
 {
+    private VideoView videoView;
 
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("avcodec");
-        System.loadLibrary("avdevice");
-        System.loadLibrary("avfilter");
-        System.loadLibrary("avformat");
-        System.loadLibrary("avutil");
-        System.loadLibrary("swresample");
-        System.loadLibrary("swscale");
-
-    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        videoView= (VideoView)findViewById(R.id.video_view);
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
     }
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    /*播放 @param btn*/
+    public void mPlay(View btn){
+        /*视频的路径 压缩的视频数据 */
+        String path = new File(Environment.getExternalStorageDirectory(),"hehuoren.flv").getAbsolutePath();
+        Player.play(path,videoView.getHolder().getSurface());
+    }
 }
