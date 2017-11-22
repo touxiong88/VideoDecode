@@ -10,13 +10,8 @@ public class MainActivity
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("avcodec");
-        System.loadLibrary("avdevice");
-        System.loadLibrary("avfilter");
-        System.loadLibrary("avformat");
-        System.loadLibrary("avutil");
-        System.loadLibrary("swresample");
-        System.loadLibrary("swscale");
+
+        System.loadLibrary("ffmpeg");
 
         System.loadLibrary("native-lib");
 
