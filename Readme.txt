@@ -1,6 +1,6 @@
+ï»¿
+Androidè°ƒç”¨ffmpegè§£ç 
 
-Androidµ÷ÓÃffmpeg½âÂë
-
-ffmpegÔ´Âë±àÒëandroid°æ±¾
+ffmpegæºç ç¼–è¯‘androidç‰ˆæœ¬
 http://blog.csdn.net/touxiong/article/details/78596520
 
