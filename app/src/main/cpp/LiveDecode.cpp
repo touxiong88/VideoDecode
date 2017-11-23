@@ -2,21 +2,28 @@
 // Created by Administrator on 2017/11/22.
 //
 #include "com_shz_videodecode_Player.h"
-#include "android/native_window_jni.h"
-#include "android/native_window.h"
-#include "avformat.h"
-#include "avcodec.h"
+#include <jni.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <android/log.h>
+#include <android/native_window_jni.h>
+#include <android/native_window.h>
+
+
+#define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO,"shz",FORMAT,##__VA_ARGS__);
+#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"shz",FORMAT,##__VA_ARGS__);
 #include "libyuv.h"
-#include "unistd.h"
 
-#include "android/log.h"
-#define LOGV(x, ...)   	fprintf(stdout,"%s:  " x "\n",TAG, ##__VA_ARGS__);
-#define LOGD(x, ...)   	fprintf(stdout,"%s:  " x "\n",TAG, ##__VA_ARGS__);
-#define LOGI(x, ...)	fprintf(stderr,"%s:  " x "\n",TAG, ##__VA_ARGS__);
-#define LOGW(x, ...)   	fprintf(stderr,"%s:  " x "\n",TAG, ##__VA_ARGS__);
-#define LOGE(x, ...)   	fprintf(stderr,"%s:  " x "\n",TAG, ##__VA_ARGS__);
+//封装格式
+#include "avformat.h"
+//解码
+#include "avcodec.h"
+//缩放
+#include "swscale.h"
 
-extern "C"{
+
 /*解码绘制*/
 JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
 (JNIEnv *env, jclass jcls, jstring path_jstr, jobject surface){
@@ -91,9 +98,9 @@ JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
 #include <stdlib.h>
 #include <string.h>
 
-#include "avcodec.h"
 #include "avutil.h"
-#include "avformat.h"
+#include "frame.h"
+
 
 #define INBUF_SIZE 4096
 
@@ -253,4 +260,3 @@ int main(int argc, char **argv)
 
 
 
-}

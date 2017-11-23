@@ -58,6 +58,12 @@ add_library(swscale
 set_target_properties(  swscale
                         PROPERTIES IMPORTED_LOCATION
                         ${distribution_DIR}/${ANDROID_ABI}/libswscale.so)
+add_library(yuv
+            SHARED
+            IMPORTED)
+set_target_properties(  swscale
+                        PROPERTIES IMPORTED_LOCATION
+                        ${distribution_DIR}/${ANDROID_ABI}/libyuv.so)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
@@ -74,10 +80,13 @@ include_directories(libs/include/libavutil)
 include_directories(libs/include/libpostproc)
 include_directories(libs/include/libswresample)
 include_directories(libs/include/libswscale)
+include_directories(libs/include/libyuv)
+include_directories(libs/include/libyuv/libyuv)
 include_directories(src/main/cpp)
 
 target_link_libraries(
                        myffmpeg
+                       yuv
                        avcodec
                        avdevice
                        avfilter
