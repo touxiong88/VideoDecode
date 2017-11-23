@@ -3,7 +3,6 @@
 //
 #include "com_shz_videodecode_Player.h"
 #include <jni.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -14,16 +13,9 @@
 
 #define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO,"shz",FORMAT,##__VA_ARGS__);
 #define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"shz",FORMAT,##__VA_ARGS__);
-#include "libyuv.h"
-
-//封装格式
-#include "avformat.h"
-//解码
-#include "avcodec.h"
-//缩放
-#include "swscale.h"
 
 
+#if 0
 /*解码绘制*/
 JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
 (JNIEnv *env, jclass jcls, jstring path_jstr, jobject surface){
@@ -260,3 +252,4 @@ int main(int argc, char **argv)
 
 
 
+#endif

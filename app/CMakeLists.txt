@@ -61,16 +61,15 @@ set_target_properties(  swscale
 add_library(yuv
             SHARED
             IMPORTED)
-set_target_properties(  swscale
+set_target_properties(  yuv
                         PROPERTIES IMPORTED_LOCATION
                         ${distribution_DIR}/${ANDROID_ABI}/libyuv.so)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 
-add_library(
-            myffmpeg
+add_library(VideoDecode
             SHARED
-            src/main/cpp/LiveDecode.cpp
+            src/main/cpp/VideoDecode.cpp
             )
 include_directories(libs/include/libavcodec)
 include_directories(libs/include/libavdevice)
@@ -85,7 +84,7 @@ include_directories(libs/include/libyuv/libyuv)
 include_directories(src/main/cpp)
 
 target_link_libraries(
-                       myffmpeg
+                       VideoDecode
                        yuv
                        avcodec
                        avdevice
