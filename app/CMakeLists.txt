@@ -19,7 +19,9 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              src/main/cpp/native-lib.cpp )
 
+
 include_directories(src/main/cpp/include)
+
 add_library(avcodec SHARED IMPORTED)
 set_target_properties(avcodec
   PROPERTIES IMPORTED_LOCATION

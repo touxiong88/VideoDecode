@@ -3,46 +3,55 @@
 //
 #include "com_shz_videodecode_Player.h"
 #include <jni.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
+#include <string>
 #include <android/log.h>
-#include <android/native_window_jni.h>
 #include <android/native_window.h>
-
+#include <android/native_window_jni.h>
+#include <unistd.h>
+extern "C"{
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
+#include <libswscale/swscale.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/time.h>
+#include "libyuv/libyuv.h"
+#include <libavcodec/avcodec.h>
+}
 
 #define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO,"shz",FORMAT,##__VA_ARGS__);
 #define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"shz",FORMAT,##__VA_ARGS__);
 
-#if 0
+
 
 /*解码绘制*/
 JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
 (JNIEnv *env, jclass jcls, jstring path_jstr, jobject surface){
 
-    const char* path_str = (*env)->GetStringUTFChars(env,path_jstr,NULL);
+    const char *path_cstr = env->GetStringUTFChars(path_jstr, 0);
 /*注册组件*/
     av_register_all();
     AVFormatContext *fmt_ctx = avformat_alloc_context();//封装格式的上下文
-    av_format_open_input(fmt_ctx,path_cstr,NULL,NULL);
-    avfomat_find_stream_info(fmt_ctx);//获取信息
-
+    avformat_open_input(&fmt_ctx,path_cstr,NULL,NULL);
+    avformat_find_stream_info(fmt_ctx,0);//获取信息
     /*获取视频流的索引位置*/
     int i,video_stream_idx= -1;
     for(;fmt_ctx->nb_streams;i++){
-        if(fmt_ctx->stream[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO){
+        if(fmt_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO){
             video_stream_idx = i;
         }
     }
     /*huoqu shipinliu jiemaqi jiema*/
-    AVCodecContext *codec_ctx = fmt_ctx->stream[video_stream_idx]->codec;
+    AVCodecContext *codec_ctx = fmt_ctx->streams[video_stream_idx]->codec;
     AVCodec *codec = avcodec_find_decoder(codec_ctx->codec_id);
-    //dakai jiemaqi
+    //打开解码器
     avcodec_open2(codec_ctx,codec,NULL);
 
     //
     AVPacket *packet = (AVPacket*) av_malloc(sizeof(AVPacket));//yasuo shuju (bianma shuju)
-    AVFrame *yuv_frame = av_frame_alloc()//jiema shuju
+    //像素数据（解码数据）
+    AVFrame *yuv_frame = av_frame_alloc();
+    AVFrame *rgb_frame = av_frame_alloc();
 
     ANativeWindow* nativeWindow = ANativeWindow_fromSurface(env,surface);
     //绘制时的缓冲区
@@ -52,39 +61,46 @@ JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
     while(av_read_frame(fmt_ctx,packet) >= 0){
         if(packet->stream_index == video_stream_idx){
             //视频解码
-            avcode_decode_video2(codec_ctx,yuv_frame,&got_frame,packet);
-            if(got_frame){// jiema chenggong
+            avcodec_decode_video2(codec_ctx,yuv_frame,&got_frame,packet);
+            if(got_frame){// 解码成功
                 //lock
                 //设置缓冲区 的属性 (width height pixel format)
                 ANativeWindow_setBuffersGeometry(nativeWindow,codec_ctx->width,codec_ctx->height,WINDOW_FORMAT_RGBA_8888);
-                ANativeWindow_lock(nativeWindow,&outBuffer,Null);
-
+                ANativeWindow_lock(nativeWindow,&outBuffer,NULL);
+                //申请帧缓冲区
+                int out_size = av_image_get_buffer_size(AV_PIX_FMT_RGBA, codec_ctx->width,codec_ctx->height, 1);
+                uint8_t *out_buffer = (uint8_t *) malloc(sizeof(uint8_t) * out_size);
                 //设置rgb_frame缓冲区 的属性 (width height pixel format)
-                //rgb_frame 缓冲区与outBuffer.bits是同一块内存
-                avpicture_fill((AVPicture *)rgb_frame,outBuffer.bits,AV_PIX_FMT_RGBA,codec_ctx->width,codec_ctx->height);
+                //rgb_frame 缓冲区与outBuffer.bits是同一块内存 avpicture_fill
+                av_image_fill_arrays(rgb_frame->data,rgb_frame->linesize,out_buffer, AV_PIX_FMT_RGBA,
+                                     codec_ctx->width, codec_ctx->height,1);
                 //绘制
                 //yuv->RGBA_8888
-                I420ToARGB( yuv_frame->data[0],yuv_frame->linesize[0],
+                libyuv::I420ToARGB( yuv_frame->data[0],yuv_frame->linesize[0],
                             yuv_frame->data[2],yuv_frame->linesize[2],
                             yuv_frame->data[1],yuv_frame->linesize[1],
                             yuv_frame->data[0],yuv_frame->linesize[0],
                             codec_ctx->width,codec_ctx->height);
 
 
-                ANativeWindow_unlockAndPost(naticeWindow);
+                ANativeWindow_unlockAndPost(nativeWindow);
                 usleep(16*1000);
                 LOGI("frame: %d",frame_count++);
             }
         }
-
+        av_free_packet(packet);
     }
 
+    ANativeWindow_release(nativeWindow);
+    av_frame_free(&yuv_frame);
+    avcodec_close(codec_ctx);
+    avformat_free_context(fmt_ctx);
 
-    (*env)->ReleaseStringUTFChars(env,path_jstr,path_cstr);
+    env->ReleaseStringUTFChars(path_jstr,path_cstr);//释放字符串
 
 }
 
-
+#if 0
 
 #include <stdio.h>
 #include <stdlib.h>
