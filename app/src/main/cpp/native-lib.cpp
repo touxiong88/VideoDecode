@@ -14,8 +14,8 @@
 #define LOGI(FORMAT,...) __android_log_print(ANDROID_LOG_INFO,"shz",FORMAT,##__VA_ARGS__);
 #define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"shz",FORMAT,##__VA_ARGS__);
 
-
 #if 0
+
 /*解码绘制*/
 JNIEXPORT void JNICALL Java_com_shz_videodecode_Player_play
 (JNIEnv *env, jclass jcls, jstring path_jstr, jobject surface){
